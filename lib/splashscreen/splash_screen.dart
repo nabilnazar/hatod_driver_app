@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:hatod_driver_app/Global/global.dart';
+import 'package:hatod_driver_app/authentication/login_screen.dart';
 import 'package:hatod_driver_app/authentication/signup_screen.dart';
 import 'package:hatod_driver_app/mainScreens/main_screens.dart';
 
@@ -14,9 +16,19 @@ class MySplashScreen extends StatefulWidget {
 class _MySplashScreenState extends State<MySplashScreen> {
   starTimer() {
     Timer(const Duration(seconds: 3), () async {
-      //send user to home screen
-      Navigator.push(
-          context, MaterialPageRoute(builder: (c)=> const SignUpScreen()));
+
+      if(await fAuth.currentUser != null)
+      {
+        currentFirebaseUser = fAuth.currentUser;
+        Navigator.push(
+            context, MaterialPageRoute(builder: (c)=> const MainScreen()));
+
+      }
+      else
+        {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (c)=> const LoginScreen()));
+        }
     });
   }
 

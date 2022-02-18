@@ -1,5 +1,9 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hatod_driver_app/Global/global.dart';
 import 'package:hatod_driver_app/authentication/login_screen.dart';
+import 'package:hatod_driver_app/splashscreen/splash_screen.dart';
 
 
 class CarInfoSceen extends StatefulWidget {
@@ -19,6 +23,21 @@ class _CarInfoSceenState extends State<CarInfoSceen> {
   List<String> carTypesList = ["hatod-x","hatod-go","bike"];
   String?selectedCarType;
 
+  saveCarInfo(){
+    Map driverCarInfoMap=
+    {
+      "car_color":carcolorEditingController.text.trim(),
+      "car_number": carnumbertextEditingController.text.trim(),
+      "car_model":carmodeltextEditingController.text.trim(),
+      "type":selectedCarType,
+    };
+
+    DatabaseReference driversRef =FirebaseDatabase.instance.ref().child("drivers");
+    driversRef.child(currentFirebaseUser!.uid).child("car_details").set(driverCarInfoMap);
+    
+    Fluttertoast.showToast(msg: "car details has saved.Congratulations!!!");
+    Navigator.push(context, MaterialPageRoute(builder: (c)=> const MySplashScreen()));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +165,10 @@ class _CarInfoSceenState extends State<CarInfoSceen> {
               ElevatedButton(
                 onPressed: () {
 
-                  Navigator.push(context, MaterialPageRoute(builder: (c)=> const LoginScreen()));
+                  if(carcolorEditingController.text.isNotEmpty && carnumbertextEditingController.text.isNotEmpty&&carmodeltextEditingController.text.isNotEmpty&&selectedCarType!=null)
+                  {
+                    saveCarInfo();
+                  }
 
                 },
                 child: const Text(
