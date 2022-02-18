@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "288056675011",
+    "firebase_url": "https://hatod-application-default-rtdb.firebaseio.com",
+    "project_id": "hatod-application",
+    "storage_bucket": "hatod-application.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:288056675011:android:a4cec29b1455c40f29b076",
+        "android_client_info": {
+          "package_name": "com.example.hatod_driver_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "288056675011-9h2bpenobu3n0fao593d9n3646gm5slf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCe8FY9ujDKN4gB_DYVv-T-uLbFGLxuL4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "288056675011-9h2bpenobu3n0fao593d9n3646gm5slf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
