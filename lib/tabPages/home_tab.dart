@@ -10,6 +10,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../Global/global.dart';
 import '../assistants/assistant_methods.dart';
+import '../assistants/black_theme_google_map.dart';
+import '../push_notifications/push_notification_system.dart';
 
 
 class HomeTabPage extends StatefulWidget {
@@ -31,182 +33,9 @@ class _HomeTabPageState extends State<HomeTabPage>
     zoom: 14.4746,
   );
 
-  Position? driverCurrentPosition;
   var geoLocator = Geolocator();
   LocationPermission? _locationPermission;
 
-
-  String statusText = "Now Offline";
-  Color buttonColor = Colors.grey;
-  bool isDriverActive = false;
-
-
-  blackThemeGoogleMap()
-  {
-    newGoogleMapController!.setMapStyle('''
-                    [
-                      {
-                        "elementType": "geometry",
-                        "stylers": [
-                          {
-                            "color": "#242f3e"
-                          }
-                        ]
-                      },
-                      {
-                        "elementType": "labels.text.fill",
-                        "stylers": [
-                          {
-                            "color": "#746855"
-                          }
-                        ]
-                      },
-                      {
-                        "elementType": "labels.text.stroke",
-                        "stylers": [
-                          {
-                            "color": "#242f3e"
-                          }
-                        ]
-                      },
-                      {
-                        "featureType": "administrative.locality",
-                        "elementType": "labels.text.fill",
-                        "stylers": [
-                          {
-                            "color": "#d59563"
-                          }
-                        ]
-                      },
-                      {
-                        "featureType": "poi",
-                        "elementType": "labels.text.fill",
-                        "stylers": [
-                          {
-                            "color": "#d59563"
-                          }
-                        ]
-                      },
-                      {
-                        "featureType": "poi.park",
-                        "elementType": "geometry",
-                        "stylers": [
-                          {
-                            "color": "#263c3f"
-                          }
-                        ]
-                      },
-                      {
-                        "featureType": "poi.park",
-                        "elementType": "labels.text.fill",
-                        "stylers": [
-                          {
-                            "color": "#6b9a76"
-                          }
-                        ]
-                      },
-                      {
-                        "featureType": "road",
-                        "elementType": "geometry",
-                        "stylers": [
-                          {
-                            "color": "#38414e"
-                          }
-                        ]
-                      },
-                      {
-                        "featureType": "road",
-                        "elementType": "geometry.stroke",
-                        "stylers": [
-                          {
-                            "color": "#212a37"
-                          }
-                        ]
-                      },
-                      {
-                        "featureType": "road",
-                        "elementType": "labels.text.fill",
-                        "stylers": [
-                          {
-                            "color": "#9ca5b3"
-                          }
-                        ]
-                      },
-                      {
-                        "featureType": "road.highway",
-                        "elementType": "geometry",
-                        "stylers": [
-                          {
-                            "color": "#746855"
-                          }
-                        ]
-                      },
-                      {
-                        "featureType": "road.highway",
-                        "elementType": "geometry.stroke",
-                        "stylers": [
-                          {
-                            "color": "#1f2835"
-                          }
-                        ]
-                      },
-                      {
-                        "featureType": "road.highway",
-                        "elementType": "labels.text.fill",
-                        "stylers": [
-                          {
-                            "color": "#f3d19c"
-                          }
-                        ]
-                      },
-                      {
-                        "featureType": "transit",
-                        "elementType": "geometry",
-                        "stylers": [
-                          {
-                            "color": "#2f3948"
-                          }
-                        ]
-                      },
-                      {
-                        "featureType": "transit.station",
-                        "elementType": "labels.text.fill",
-                        "stylers": [
-                          {
-                            "color": "#d59563"
-                          }
-                        ]
-                      },
-                      {
-                        "featureType": "water",
-                        "elementType": "geometry",
-                        "stylers": [
-                          {
-                            "color": "#17263c"
-                          }
-                        ]
-                      },
-                      {
-                        "featureType": "water",
-                        "elementType": "labels.text.fill",
-                        "stylers": [
-                          {
-                            "color": "#515c6d"
-                          }
-                        ]
-                      },
-                      {
-                        "featureType": "water",
-                        "elementType": "labels.text.stroke",
-                        "stylers": [
-                          {
-                            "color": "#17263c"
-                          }
-                        ]
-                      }
-                    ]
-                ''');
-  }
 
   checkIfLocationPermissionAllowed() async
   {
@@ -231,6 +60,45 @@ class _HomeTabPageState extends State<HomeTabPage>
 
     String humanReadableAddress = await AssistantMethods.searchAddressForGeographicCoOrdinates(driverCurrentPosition!, context);
     print("this is your address = " + humanReadableAddress);
+
+    AssistantMethods.readDriverRatings(context);
+  }
+
+  readCurrentDriverInformation() async
+  {
+    currentFirebaseUser = fAuth.currentUser;
+
+    await FirebaseDatabase.instance.ref()
+        .child("drivers")
+        .child(currentFirebaseUser!.uid)
+        .once()
+        .then((DatabaseEvent snap)
+    {
+      if(snap.snapshot.value != null)
+      {
+        onlineDriverData.id = (snap.snapshot.value as Map)["id"];
+        onlineDriverData.name = (snap.snapshot.value as Map)["name"];
+        onlineDriverData.phone = (snap.snapshot.value as Map)["phone"];
+        onlineDriverData.email = (snap.snapshot.value as Map)["email"];
+        onlineDriverData.car_color = (snap.snapshot.value as Map)["car_details"]["car_color"];
+        onlineDriverData.car_model = (snap.snapshot.value as Map)["car_details"]["car_model"];
+        onlineDriverData.car_number = (snap.snapshot.value as Map)["car_details"]["car_number"];
+
+        driverVehicleType = (snap.snapshot.value as Map)["car_details"]["type"];
+
+        print("Car Details :: ");
+        print(onlineDriverData.car_color);
+        print(onlineDriverData.car_model);
+        print(onlineDriverData.car_number);
+      }
+    });
+
+    PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
+    pushNotificationSystem.initializeCloudMessaging(context);
+    pushNotificationSystem.generateAndGetToken();
+
+    AssistantMethods.readDriverEarnings(context);
+
   }
 
   @override
@@ -239,6 +107,7 @@ class _HomeTabPageState extends State<HomeTabPage>
     super.initState();
 
     checkIfLocationPermissionAllowed();
+    readCurrentDriverInformation();
   }
 
   @override
@@ -255,7 +124,7 @@ class _HomeTabPageState extends State<HomeTabPage>
             newGoogleMapController = controller;
 
             //black theme google map
-            blackThemeGoogleMap();
+            blackThemeGoogleMap(newGoogleMapController);
 
             locateDriverPosition();
           },
@@ -283,17 +152,17 @@ class _HomeTabPageState extends State<HomeTabPage>
                 {
                   if(isDriverActive != true) //offline
                       {
-                    driverIsOnlineNow();
-                    updateDriversLocationAtRealTime();
+                          driverIsOnlineNow();
+                          updateDriversLocationAtRealTime();
 
-                    setState(() {
-                      statusText = "Now Online";
-                      isDriverActive = true;
-                      buttonColor = Colors.transparent;
-                    });
+                          setState(() {
+                            statusText = "Now Online";
+                            isDriverActive = true;
+                            buttonColor =const Color(0xFF053BB3);
+                          });
 
-                    //display Toast
-                    Fluttertoast.showToast(msg: "you are Online Now");
+                          //display Toast
+                          Fluttertoast.showToast(msg: "you are Online Now");
                   }
                   else //online
                       {
@@ -302,7 +171,7 @@ class _HomeTabPageState extends State<HomeTabPage>
                     setState(() {
                       statusText = "Now Offline";
                       isDriverActive = false;
-                      buttonColor = Colors.grey;
+                      buttonColor =const Color(0xFF053BB3);
                     });
 
                     //display Toast
@@ -310,7 +179,7 @@ class _HomeTabPageState extends State<HomeTabPage>
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: buttonColor,
+                  primary: const Color(0xFF053BB3),
                   padding: const EdgeInsets.symmetric(horizontal: 18),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(26),
@@ -381,7 +250,8 @@ class _HomeTabPageState extends State<HomeTabPage>
         driverCurrentPosition!.latitude,
         driverCurrentPosition!.longitude,
       );
-
+      print(latLng);
+      print("this is driver current location");
       newGoogleMapController!.animateCamera(CameraUpdate.newLatLng(latLng));
     });
   }

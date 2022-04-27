@@ -39,7 +39,7 @@ class _MainScreenState extends State<MainScreen>
         controller: tabController,
         children: const [
           HomeTabPage(),
-          EarningsTabpage(),
+          EarningsTabPage(),
           RatingsTabPage(),
           ProfileTabPage(),
         ],

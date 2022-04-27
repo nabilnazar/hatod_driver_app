@@ -1,9 +1,8 @@
-import 'dart:ffi';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:hatod_driver_app/infoHandler/app_info.dart';
 import 'package:hatod_driver_app/splashscreen/splash_screen.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,12 +10,15 @@ void main() async {
 
   runApp(
     MyApp(
-      child: MaterialApp(
-        title: 'Hatod Drivers App',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
+      child: ChangeNotifierProvider(
+        create: (context) => AppInfo(),
+        child: MaterialApp(
+          title: 'Hatod Drivers App',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: const MySplashScreen(),
         ),
-        home: const MySplashScreen(),
       ),
     ),
   );
